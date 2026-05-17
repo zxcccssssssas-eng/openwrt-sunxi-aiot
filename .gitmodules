@@ -1,3 +1,4 @@
 [submodule "package/kernel/aic8800-usb"]
 	path = package/kernel/aic8800-usb
 	url = https://github.com/zxcccssssssas-eng/aic8800-usb_openwrt.git
+	branch = main
