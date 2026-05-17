@@ -1,5 +1,6 @@
 ![OpenWrt logo](include/logo.png)
 This patch is trying to fix the wifi on radxa cubie a7a
+
 OpenWrt Project is a Linux operating system targeting embedded devices. Instead
 of trying to create a single, static firmware, OpenWrt provides a fully
 writable filesystem with package management. This frees you from the
