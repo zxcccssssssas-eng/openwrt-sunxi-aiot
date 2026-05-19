@@ -67,6 +67,14 @@ make4.1+ perl python3.7+ rsync subversion unzip which
    cross-compile toolchain and then cross-compile the GNU/Linux kernel & all chosen
    applications for your target system.
 
+
+### Hardware Support Status:
+- [x] CPU / Frequency Scaling
+- [x] Gigabit Ethernet (GMAC)
+- [?] Wi-Fi (AIC8000D80) - *Untest?*
+- [x] MicroSD / eMMC Storage
+- [x] USB Ports (realtek wifi dongle works fine)
+
 ### Related Repositories
 
 The main repository uses multiple sub-repositories to manage packages of
