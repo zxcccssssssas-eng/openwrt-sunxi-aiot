@@ -72,7 +72,7 @@ make4.1+ perl python3.7+ rsync subversion unzip which
 - [x] CPU / Frequency Scaling
 - [x] Gigabit Ethernet (GMAC)
 - [?] Wi-Fi (AIC8000D80) - *Untest?*
-- [x] MicroSD / eMMC Storage
+- [x] MicroSD
 - [x] USB Ports (realtek wifi dongle works fine)
 
 ### Related Repositories
