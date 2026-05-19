@@ -49,6 +49,8 @@ make4.1+ perl python3.7+ rsync subversion unzip which
 ```
 
 ### Quickstart
+0.git clone --recurse-submodules https://github.com/zxcccssssssas-eng/openwrt-sunxi-aiot.git
+
 
 1. Run `./scripts/feeds update -a` to obtain all the latest package definitions
    defined in feeds.conf / feeds.conf.default
