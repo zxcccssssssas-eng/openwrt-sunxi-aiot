@@ -60,8 +60,10 @@ make4.1+ perl python3.7+ rsync subversion unzip which
 
 3. Run `make menuconfig` to select your preferred configuration for the
    toolchain, target system & firmware packages.
+4. In the Target system,select "Allwinner Aiot"
+5. Then,in the Target Profile,select you board(a7a or a7z)
 
-4. Run `make` to build your firmware. This will download all sources, build the
+6. Run `make` to build your firmware. This will download all sources, build the
    cross-compile toolchain and then cross-compile the GNU/Linux kernel & all chosen
    applications for your target system.
 
