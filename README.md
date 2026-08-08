@@ -71,7 +71,7 @@ make4.1+ perl python3.7+ rsync subversion unzip which
 ### Hardware Support Status:
 - [x] CPU / Frequency Scaling
 - [x] Gigabit Ethernet (GMAC)
-- [?] Wi-Fi (AIC8000D80) - *Untest?*
+- [x] Wi-Fi (AIC8000D80) - *Tested* Default SSID:Cubie-A7A Password:password123
 - [x] MicroSD
 - [x] USB Ports (realtek wifi dongle works fine)
 
