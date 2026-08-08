@@ -2,3 +2,6 @@
 	path = package/kernel/aic8800-usb
 	url = https://github.com/zxcccssssssas-eng/aic8800-usb_openwrt.git
 	branch = main
+[submodule "package/openclash"]
+	path = package/openclash
+	url = https://github.com/vernesong/OpenClash.git
