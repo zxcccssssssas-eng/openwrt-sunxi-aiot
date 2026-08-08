@@ -3,15 +3,21 @@
 
 # Fix: AIC8800 USB WiFi may not be ready at boot (USB enumerate / fw load
 # is slow, hostapd can start before the phy exists and then is skipped).
-# Check every 10s; once a phy appears, reload wireless (max 5 tries).
+# Poll every 10s: AP radio (radio0) up AND hostapd running means wifi is
+# fine. Otherwise reload wireless; if reload does not bring the radio up
+# (aic8800 quirk), fall back to `wifi up`. Max 5 tries = 50s.
 (
 	i=0
 	while [ $i -lt 5 ]; do
 		sleep 10
 		i=$((i+1))
-		if ls /sys/class/ieee80211/ 2>/dev/null | grep -q phy; then
-			wifi reload 2>/dev/null
+		if [ "$(wifi status 2>/dev/null | jsonfilter -e '@.radio0.up')" = "true" ] && pgrep -f hostapd >/dev/null 2>&1; then
 			break
+		fi
+		wifi reload 2>/dev/null
+		sleep 3
+		if [ "$(wifi status 2>/dev/null | jsonfilter -e '@.radio0.up')" != "true" ]; then
+			wifi up 2>/dev/null
 		fi
 	done
 ) &
