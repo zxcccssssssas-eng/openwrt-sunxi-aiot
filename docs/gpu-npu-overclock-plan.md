@@ -133,23 +133,32 @@ Platform glue already exists:
 
 ### 4.2 Version lock (do not ignore)
 
-This tree's galcore reports **`6.4.18.6.904649`**
-(`bsp/drivers/npu/aw_nna_galcore/inc/gc_hal_version.h`).
+Galcore / userspace versions in the wild (must match **exactly**):
 
-The only public A733/T527 unified **userspace** blob (Radxa `ai-sdk` /
-`unified-tina`) is **`6.4.15.3.690884`**. Mixing kernel 6.4.18 with userspace
-6.4.15 is a known failure mode
-([MaverickLong/Radxa-A733-NPU-Unified-Driver-Support-Package](https://github.com/MaverickLong/Radxa-A733-NPU-Unified-Driver-Support-Package)).
+| Piece | Version | Where |
+| --- | --- | --- |
+| This tree's galcore | **6.4.18.6.904649** | `aw_nna_galcore/inc/gc_hal_version.h` |
+| Radxa `allwinner-bsp` galcore | 6.4.18.x (same family) | `drivers/npu/aw_nna_galcore` |
+| Public unified userspace (`ai-sdk` / `unified-tina`) | **6.4.15.3.690884** | [ZIFENG278/ai-sdk](https://github.com/ZIFENG278/ai-sdk) |
+| Community 6.6 galcore patch set | 6.4.15.3 + `galcore_6.6_kernel_api_drift.patch` | [MaverickLong](https://github.com/MaverickLong/Radxa-A733-NPU-Unified-Driver-Support-Package) |
+| Some Radxa SDK notes | 6.4.18.0.906669 | newer official HAL; still not this tree's 6.4.18.6 |
+
+Mixing any of these pairs is a known NPU failure mode. This tree already
+includes 6.6 API ifdefs, so the MaverickLong drift patch is a reference, not
+a required import, **unless** we downgrade to 6.4.15.3 for userspace match.
 
 Plan:
 
-- **Kernel-only milestone:** ship 6.4.18 galcore so `/dev/galcore` appears.
+- **Kernel-only milestone:** ship current 6.4.18 galcore so `/dev/galcore` appears.
 - **Userspace milestone:** either
-  - downgrade in-tree galcore to 6.4.15.3 (copy from that support package /
-    older Radxa BSP) **or**
-  - wait for a matching 6.4.18 userspace.
-- Prefer **VIPLite** for OpenWrt inference (`kmod-aw-nna-vip` + `libVIPhal`)
-  because VIPLite is smaller and does not need the unified HAL version dance.
+  - downgrade in-tree galcore to **6.4.15.3** (only public userspace) **or**
+  - wait for a matching 6.4.18.6 userspace.
+- Prefer **VIPLite** for OpenWrt inference (`kmod-aw-nna-vip` + `libVIPhal`
+  from `ai-sdk` `viplite-tina`) because VIPLite is smaller and does not need
+  the unified HAL version dance.
+- `reserved-memory` in `sun60iw2p1.dtsi` currently only reserves BL31. If
+  galcore probe fails on CMA/contiguous alloc, add an NPU reserved/CMA node
+  before chasing driver bugs.
 
 ### 4.3 VIPLite as the OpenWrt-friendly NPU option
 
@@ -157,7 +166,10 @@ Plan:
    `KCONFIG:=CONFIG_AW_NNA_VIP=m CONFIG_NNA_VIP2=y`.
 2. Make it conflict with `kmod-aw-nna-galcore`.
 3. Enable `NPU_SET_CLK_VOL` if voltage/clock from DT should stay in-driver.
-4. Probe test: `/dev/vipcore` after `insmod`.
+4. Probe test: `/dev/vipcore` after `insmod` (`DEVICE_NAME` is `vipcore`,
+   not `vipscore`).
+5. Blacklist the unused stack (`galcore` vs `vipcore`) so they cannot both
+   bind `allwinner,npu`.
 
 VIPLite in this tree is **2.0.3** (`vip_lite_version.h`, patch string
 `4-AW-2025-10-27`). Userspace must match that VIPLite ABI, not galcore.
@@ -209,7 +221,10 @@ is render-only and talks through DRM-PRIME.
 This is what Radxa Debian actually ships (`img-bxm-dkms`, DDK `24.2@6603887`,
 firmware BVNC **`36.56.104.183`**).
 
-Source is **not** in this tree. Import it as an out-of-tree package:
+Source is **not** in this tree and **not** in public `radxa/allwinner-bsp`
+(`drivers/gpu/` there is also only lima/panfrost). The DDK lives in the
+Radxa apt package `img-bxm-dkms` / Tina `rogue_km`. Import it as an
+out-of-tree OpenWrt package (OpenWrt has no DKMS):
 
 1. Vendor drop: Radxa `img-bxm-dkms` (`rogue_km` / `sunxi_linux` kbuild) or
    the matching Allwinner Tina `pvrsrvkm` tree.
