@@ -2,6 +2,8 @@
 #
 # Copyright (C) 2013-2016 OpenWrt.org
 
+ALLWINNER_A733_MENU:=Allwinner A733 extras
+
 define KernelPackage/rtc-sunxi
     SUBMENU:=$(OTHER_MENU)
     TITLE:=Sunxi SoC built-in RTC support
@@ -94,3 +96,65 @@ define KernelPackage/sound-soc-sunxi-spdif/description
 endef
 
 $(eval $(call KernelPackage,sound-soc-sunxi-spdif))
+
+define KernelPackage/aw-nna-galcore
+  SUBMENU:=$(ALLWINNER_A733_MENU)
+  TITLE:=Allwinner Vivante NPU (galcore / unified)
+  DEPENDS:=@TARGET_allwinner
+  KCONFIG:=CONFIG_AW_NNA_GALCORE
+  FILES:=$(LINUX_DIR)/bsp/drivers/npu/aw_nna_galcore/galcore.ko
+  AUTOLOAD:=$(call AutoProbe,galcore)
+  CONFLICTS:=kmod-aw-nna-vip
+endef
+
+define KernelPackage/aw-nna-galcore/description
+  In-tree Vivante galcore driver for the A733 NPU (VIP9000).
+  Creates /dev/galcore. Kernel ABI is 6.4.18.6.904649 and must match
+  userspace exactly; public TIM-VX builds are often 6.4.15.x and will
+  not work. Vendor userspace is glibc; musl images will not run it.
+  Mutually exclusive with kmod-aw-nna-vip.
+endef
+
+$(eval $(call KernelPackage,aw-nna-galcore))
+
+define KernelPackage/aw-nna-vip
+  SUBMENU:=$(ALLWINNER_A733_MENU)
+  TITLE:=Allwinner NPU VIPLite 2 (vipcore)
+  DEPENDS:=@TARGET_allwinner
+  KCONFIG:= \
+	CONFIG_AW_NNA_VIP \
+	CONFIG_NNA_VIP2=y \
+	CONFIG_NNA_VIP1=n
+  FILES:=$(LINUX_DIR)/bsp/drivers/npu/aw_nna_vip/vip2/vipcore.ko
+  AUTOLOAD:=$(call AutoProbe,vipcore)
+  CONFLICTS:=kmod-aw-nna-galcore
+endef
+
+define KernelPackage/aw-nna-vip/description
+  In-tree VIPLite 2.0.3 driver for the A733 NPU. Creates /dev/vipcore.
+  Preferred OpenWrt inference stack versus galcore. Userspace must match
+  VIPLite 2.0.3; vendor libs are glibc.
+  Mutually exclusive with kmod-aw-nna-galcore (same DT node).
+endef
+
+$(eval $(call KernelPackage,aw-nna-vip))
+
+define KernelPackage/drm-powervr
+  SUBMENU:=$(ALLWINNER_A733_MENU)
+  TITLE:=Imagination PowerVR BXM (drm/imagination backport)
+  DEPENDS:=@TARGET_allwinner +powervr-firmware
+  KCONFIG:=CONFIG_DRM_POWERVR
+  FILES:=$(LINUX_DIR)/drivers/gpu/drm/imagination/powervr.ko
+  AUTOLOAD:=$(call AutoProbe,powervr)
+  MODPARAMS.powervr:=exp_hw_support=1
+endef
+
+define KernelPackage/drm-powervr/description
+  Backport of upstream drm/imagination (Linux 6.18+) to this 6.6 tree.
+  Binds the A733 BXM-4-64 GPU (compatible img,img-rogue) and creates a
+  render node. Needs firmware powervr/rogue_36.56.104.183_v1.fw.
+  A733 BVNC 36.56.104.183 is experimental; exp_hw_support=1 is set.
+  Mesa pvr userspace is a separate, typically glibc, problem.
+endef
+
+$(eval $(call KernelPackage,drm-powervr))

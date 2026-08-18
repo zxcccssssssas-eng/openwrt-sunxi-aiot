@@ -1923,6 +1923,7 @@
 
 &gpu  {
 	gpu-supply = <&reg_dcdc4>;
+	status = "okay";
 };
 
 &sid {
