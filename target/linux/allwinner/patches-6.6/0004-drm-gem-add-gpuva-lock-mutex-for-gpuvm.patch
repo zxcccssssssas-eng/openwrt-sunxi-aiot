@@ -1,0 +1,27 @@
+From: OpenWrt sunxi AIoT
+Subject: drm/gem: add gpuva.lock mutex needed by backported DRM GPUVM
+
+Linux 6.8+ drm_gpuvm protects drm_gem_object.gpuva.list with gpuva.lock
+when DRM_GPUVM_IMMEDIATE_MODE is set. 6.6 only has the list and a lockdep
+map. Add the mutex so the PowerVR backport can compile and run.
+
+Signed-off-by: Cursor Agent <cursor@local>
+
+--- a/include/drm/drm_gem.h
++++ b/include/drm/drm_gem.h
+@@ -401,6 +401,8 @@ struct drm_gem_object {
+ #ifdef CONFIG_LOCKDEP
+ 		struct lockdep_map *lock_dep_map;
+ #endif
++		/* Backport of 6.8+ DRM GPUVM: protects gpuva.list in immediate mode. */
++		struct mutex lock;
+ 	} gpuva;
+ 
+ 	/**
+@@ -670,6 +672,7 @@ static inline void drm_gem_gpuva_init(struct drm_gem_object *obj)
+ {
+ 	INIT_LIST_HEAD(&obj->gpuva.list);
++	mutex_init(&obj->gpuva.lock);
+ }
+ 
+ /**

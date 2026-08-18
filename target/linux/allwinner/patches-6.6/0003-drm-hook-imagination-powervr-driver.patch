@@ -1,0 +1,28 @@
+From: OpenWrt sunxi AIoT
+Subject: drm: hook Imagination PowerVR driver into 6.6 DRM Kbuild
+
+The A733 GPU is PowerVR BXM-4-64. Upstream drm/imagination lives in
+Linux 6.8+; the sources are supplied via files/drivers/gpu/drm/imagination.
+
+Signed-off-by: Cursor Agent <cursor@local>
+
+--- a/drivers/gpu/drm/Makefile
++++ b/drivers/gpu/drm/Makefile
+@@ -211,6 +211,7 @@ obj-$(CONFIG_DRM_XEN) += xen/
+ obj-$(CONFIG_DRM_VBOXVIDEO) += vboxvideo/
+ obj-$(CONFIG_DRM_LIMA) += lima/
+ obj-$(CONFIG_DRM_PANFROST) += panfrost/
++obj-$(CONFIG_DRM_POWERVR) += imagination/
+ obj-$(CONFIG_DRM_ASPEED_GFX) += aspeed/
+ obj-$(CONFIG_DRM_MCDE) += mcde/
+ obj-$(CONFIG_DRM_TIDSS) += tidss/
+--- a/drivers/gpu/drm/Kconfig
++++ b/drivers/gpu/drm/Kconfig
+@@ -530,6 +530,8 @@ source "drivers/gpu/drm/vboxvideo/Kconfig"
+ source "drivers/gpu/drm/lima/Kconfig"
+ 
+ source "drivers/gpu/drm/panfrost/Kconfig"
++
++source "drivers/gpu/drm/imagination/Kconfig"
+ 
+ source "drivers/gpu/drm/aspeed/Kconfig"

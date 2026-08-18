@@ -2358,7 +2358,7 @@
 			reset-names = "npu_rst", "npu_axi_rst", "npu_ahb_rst";
 			power-domains = <&pd SUN60IW2_PCK_NPU>;
 			npu-vf = <1008>;
-			status = "disable";
+			status = "disabled";
 		};
 
 		hwspinlock: hwspinlock@3005000 {
@@ -4581,24 +4581,16 @@
 
 		gpu: gpu@1800000 {
 			device_type = "gpu";
-			compatible = "img,gpu";
+			compatible = "allwinner,sun60i-a733-gpu", "img,img-bxm-4-64", "img,img-rogue";
 			reg = <0x0 0x01800000 0x0 0x8ffff>;
 			interrupts = <GIC_SPI 63 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
 			interrupt-names = "IRQGPU", "IRQGPUDVFS";
-			clocks = <&ccu CLK_PLL_GPU0>,
-				 <&ccu CLK_GPU0>,
+			clocks = <&ccu CLK_GPU0>,
 				 <&ccu CLK_BUS_GPU0>,
-				 <&ccu CLK_PLL_PERI0_800M>,
-				 <&ccu CLK_PLL_PERI0_600M>,
-				 <&ccu CLK_PLL_PERI0_400M>,
-				 <&ccu CLK_PLL_PERI0_300M>,
-				 <&ccu CLK_PLL_PERI0_200M>;
-			clock-names = "clk_parent", "clk", "clk_bus",
-				"clk_800", "clk_600", "clk_400",
-				"clk_300", "clk_200";
+				 <&ccu CLK_PLL_GPU0>;
+			clock-names = "core", "mem", "sys";
 			resets = <&ccu RST_BUS_GPU0>;
-			reset-names = "reset_bus";
 			/*power-domains = <&pd SUN60IW2_PCK_GPU_TOP>;*/
 			operating-points-v2 = <&gpu_opp_table>;
 			#cooling-cells = <2>;

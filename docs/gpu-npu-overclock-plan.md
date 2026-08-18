@@ -455,12 +455,39 @@ Userspace checks (glibc image or chroot):
 6. (Later) mainline `drm/imagination` backport or a 6.18 kernel bump.
 7. (Later) glibc userspace story for TIM-VX / Mesa.
 
+## 12. Implementation status (executed)
+
+Track **B** (mainline `drm/imagination` backport) was implemented instead of
+vendor `pvrsrvkm`, as requested.
+
+| Package | menuconfig | Default | Notes |
+| --- | --- | --- | --- |
+| `kmod-aw-nna-galcore` | Allwinner A733 extras | not in image | `/dev/galcore`, ABI 6.4.18.6 |
+| `kmod-aw-nna-vip` | Allwinner A733 extras | not in image | `/dev/vipcore`, conflicts with galcore |
+| `kmod-drm-powervr` | Allwinner A733 extras | not in image | 6.18+ PowerVR + bundled drm_gpuvm, `exp_hw_support=1` |
+| `powervr-firmware` | Firmware | pulled by kmod | `powervr/rogue_36.56.104.183_v1.fw` |
+| `kmod-sunxi-overclock` | Allwinner A733 extras | **n**, no autoload | UCI `/etc/config/overclock`, caps 1120/1008 MHz |
+
+GPU DT now matches mainline: `img,img-bxm-4-64` / `img,img-rogue` with
+`clock-names = "core", "mem", "sys"`. NPU dtsi typo `disable` → `disabled`.
+
+Enable with `make menuconfig` (do not add to `DEVICE_PACKAGES` until probe is
+proven on hardware):
+
+```
+Kernel modules → Allwinner A733 extras → kmod-drm-powervr
+Kernel modules → Allwinner A733 extras → kmod-aw-nna-vip   (or galcore)
+```
+
+
 ## 11. Sources used for this plan
 
 - This tree: `target/linux/allwinner/`, board DTS, `aw_nna_galcore`, `aw_nna_vip`
 - [Radxa Cubie A7A docs](https://docs.radxa.com/en/cubie/a7a) — SoC / GPU / NPU specs
 - [Radxa NPU / ACUITY guide](https://docs.radxa.com/en/cubie/a7a/app-dev/npu-dev/cubie-acuity-sdk)
 - [MaverickLong unified-driver notes](https://github.com/MaverickLong/Radxa-A733-NPU-Unified-Driver-Support-Package) — 6.4.15 vs 6.4.18 lock
+- [ZIFENG278/ai-sdk](https://github.com/ZIFENG278/ai-sdk) — `unified-tina` / `viplite-tina` userspace
+- [radxa/allwinner-bsp](https://github.com/radxa/allwinner-bsp) — NPU sources public; PowerVR DDK is **not** in that git
 - [ayiejosh/a733-powervr-fex](https://github.com/ayiejosh/a733-powervr-fex) — pvrsrvkm PRIME, 6.6 deadlock
 - [alexcaoys/allwinner-bsp](https://github.com/alexcaoys/allwinner-bsp) — mainline PowerVR on 6.18
 - [Radxa img-bxm-dkms 6.6 thread](https://forum.radxa.com/t/failed-to-build-module-img-bxm-dkms/30839) — `sunxi-sid.h`

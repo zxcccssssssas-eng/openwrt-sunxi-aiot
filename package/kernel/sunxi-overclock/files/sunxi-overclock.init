@@ -1,0 +1,31 @@
+#!/bin/sh /etc/rc.common
+# Optional A733 GPU/NPU overclock. Does nothing unless enabled=1.
+
+START=99
+
+USE_PROCD=0
+
+start() {
+	local enabled profile npu_mhz gpu_mhz
+
+	config_load overclock
+	config_get_bool enabled overclock enabled 0
+	[ "$enabled" = 1 ] || return 0
+
+	config_get profile overclock profile stock
+	config_get npu_mhz overclock npu_mhz 0
+	config_get gpu_mhz overclock gpu_mhz 0
+
+	modprobe sunxi-overclock \
+		profile="$profile" \
+		npu_mhz="$npu_mhz" \
+		gpu_mhz="$gpu_mhz" || \
+		insmod /lib/modules/$(uname -r)/sunxi-overclock.ko \
+			profile="$profile" \
+			npu_mhz="$npu_mhz" \
+			gpu_mhz="$gpu_mhz"
+}
+
+stop() {
+	rmmod sunxi-overclock 2>/dev/null || true
+}
